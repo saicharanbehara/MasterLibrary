@@ -21,6 +21,8 @@ const Vendor = () => {
     const [operation, setOperation] = useState('');
     const [categories, setCategories] = useState([]);
     const [acquisitionTypes, setAcquisitionTypes] = useState([]);
+    const [editMode, setEditMode] = useState(false);
+
 
     const resultsPerPage = 5;
     const apiUrl = 'https://localhost:7270/api/Master/Vendor';
@@ -101,61 +103,68 @@ const Vendor = () => {
     };
 
     const handleInsert = async () => {
-        setOperation('INSERT');
-        try {
-            const response = await axios.post(apiUrl, {
-                Flag: "INSERT",
-                VendorID: null,
-                VendorName: form.VendorName,
-                ContactPerson: form.ContactPerson,
-                Phone: form.Phone,
-                Address: form.Address,
-                vendorCategoryTypesVendor: form.categoryType.map(catId => ({
-                    VendorID: null,
-                    CategoryID: catId
-                })),
-                vendorAcquisitionTypeTypeVendor: form.acquisitionType.map(acqId => ({
-                    VendorID: null,
-                    AcquisitionTypeID: acqId
-                }))
-            });
-            setMessage(response.data.message || "Inserted.");
-            handleView();
-            clearForm();
-        } catch (err) {
-            setMessage("Insert failed: " + err.message);
-            clearForm();
-        }
-    };
+  const payload = {
+    vendor: {
+      VendorID: null,
+      VendorName: form.VendorName,
+      ContactPerson: form.ContactPerson,
+      Phone: form.Phone,
+      Address: form.Address,
+      Status: form.Status,
+      Flag: 'INSERT'
+    },
+    vendorCategoryTypeList: form.categoryType.map(categoryID => ({
+      VendorID: null, // Backend should assign this post-insert
+      CategoryID: categoryID
+    })),
+    vendorAcquisitionTypeList: form.acquisitionType.map(acquisitionTypeID => ({
+      VendorID: null, // Backend should assign this post-insert
+      AcquisitionTypeID: acquisitionTypeID
+    }))
+  };
 
-    const handleUpdate = async () => {
-        if (!form.VendorID) return setMessage("VendorID required for update.");
-        setOperation('UPDATE');
-        try {
-            const response = await axios.post(apiUrl, {
-                Flag: "UPDATE",
-                VendorID: form.VendorID,
-                VendorName: form.VendorName,
-                ContactPerson: form.ContactPerson,
-                Phone: form.Phone,
-                Address: form.Address,
-                vendorCategoryTypesVendor: form.categoryType.map(catId => ({
-                    VendorID: form.VendorID,
-                    CategoryID: catId
-                })),
-                vendorAcquisitionTypeTypeVendor: form.acquisitionType.map(acqId => ({
-                    VendorID: form.VendorID,
-                    AcquisitionTypeID: acqId
-                }))
-            });
-            setMessage(response.data.message || "Updated.");
-            handleView();
-            clearForm();
-        } catch (err) {
-            setMessage("Update failed: " + err.message);
-            clearForm();
-        }
-    };
+  try {
+    await axios.post('https://localhost:7270/api/Master/Vendor', payload);
+    setMessage('Vendor inserted successfully.');
+    handleView();
+  } catch (err) {
+    console.error(err);
+    setMessage('Insert failed.');
+  }
+};
+
+const handleUpdate = async () => {
+  const payload = {
+    vendor: {
+      VendorID: form.VendorID,
+      VendorName: form.VendorName,
+      ContactPerson: form.ContactPerson,
+      Phone: form.Phone,
+      Address: form.Address,
+      Status: form.Status,
+      Flag: 'UPDATE'
+    },
+    vendorCategoryTypeList: form.categoryType.map(categoryID => ({
+      VendorID: form.VendorID,
+      CategoryID: categoryID
+    })),
+    vendorAcquisitionTypeList: form.acquisitionType.map(acquisitionTypeID => ({
+      VendorID: form.VendorID,
+      AcquisitionTypeID: acquisitionTypeID
+    }))
+  };
+
+  try {
+    await axios.post('https://localhost:7270/api/Master/Vendor', payload);
+    setMessage('Vendor updated successfully.');
+    handleView();
+    setEditMode(false);
+  } catch (err) {
+    console.error(err);
+    setMessage('Update failed.');
+  }
+};
+
 
     const handleView = async () => {
         setOperation('VIEW');
