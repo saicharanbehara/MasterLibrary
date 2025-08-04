@@ -18,7 +18,7 @@ const AcquisitionType = () => {
     const [message, setMessage] = useState('');
     const [operation, setOperation] = useState('');
 
-    const resultsPerPage = 6;
+    const resultsPerPage = 5;
     const apiUrl = 'https://localhost:7270/api/Master/AcquisitionType';
 
     useEffect(() => { 

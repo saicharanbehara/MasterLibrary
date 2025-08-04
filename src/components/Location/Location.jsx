@@ -13,7 +13,7 @@ const Location = () => {
 
     const [viewResults, setViewResults] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const resultsPerPage = 6;
+    const resultsPerPage = 5;
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
