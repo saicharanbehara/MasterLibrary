@@ -37,7 +37,7 @@ const Vendor = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ flag: "VIEW" })
+                body: JSON.stringify({ Flag: "VIEW" })
             });
             const data = await response.json();
             setCategories(data.variables || []);
@@ -49,12 +49,12 @@ const Vendor = () => {
 
     const fetchAcquisitionTypes = async () => {
         try {
-            const response = await fetch('https://localhost:7270/api/Master/AcquisitionType', {
+            const response = await fetch('https://localhost:7270/api/Master/AquisitionType', {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ flag: "VIEW" })
+                body: JSON.stringify({ Flag: "VIEW" })
             });
             const data = await response.json();
             setAcquisitionTypes(data.variables || []);
@@ -104,7 +104,7 @@ const Vendor = () => {
         setOperation('INSERT');
         try {
             const response = await axios.post(apiUrl, {
-                flag: "INSERT",
+                Flag: "INSERT",
                 VendorID: null,
                 VendorName: form.VendorName,
                 ContactPerson: form.ContactPerson,
@@ -133,7 +133,7 @@ const Vendor = () => {
         setOperation('UPDATE');
         try {
             const response = await axios.post(apiUrl, {
-                flag: "UPDATE",
+                Flag: "UPDATE",
                 VendorID: form.VendorID,
                 VendorName: form.VendorName,
                 ContactPerson: form.ContactPerson,
@@ -161,7 +161,7 @@ const Vendor = () => {
         setOperation('VIEW');
         try {
             const response = await axios.post(apiUrl, {
-                flag: "VIEW",
+                Flag: "VIEW",
                 VendorID: form.VendorID ? parseInt(form.VendorID) : null,
                 VendorName: null,
                 ContactPerson: null,
@@ -186,7 +186,7 @@ const Vendor = () => {
         setOperation('DELETE');
         try {
             const response = await axios.post(apiUrl, {
-                flag: "DELETE",
+                Flag: "DELETE",
                 VendorID: deleteTarget.VendorID
             });
             setMessage(response.data.message || "Deleted.");

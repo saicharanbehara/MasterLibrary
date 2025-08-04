@@ -180,3 +180,62 @@
   background: #5e3bee;
   color: white;
 }
+
+/* --- your original styles remain unchanged --- */
+
+/* Category / AcquisitionType Checkboxes */
+.checkbox-group {
+  margin: 1rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  appearance: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid #ccc;
+  border-radius: 0.2rem;
+  transition: 0.2s;
+  display: inline-block;
+  position: relative;
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+  background-color: #5e3bee;
+  border-color: #5e3bee;
+}
+
+.checkbox-label input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 3px;
+  height: 6px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+}
+
+.checkbox-label input[type="checkbox"]:checked::after {
+  opacity: 1;
+}
+
+/* Keep spacing consistent with form */
+.vendor-form .checkbox-group-title {
+  font-weight: 600;
+  margin: 0.8rem 0 0.4rem 0;
+  color: #333;
+  font-size: 1rem;
+}
