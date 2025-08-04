@@ -1,0 +1,176 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const Location = () => {
+    const [form, setForm] = useState({
+        locationId: '',
+        floor: '',
+        section: '',
+        shelf: '',
+        locationName: ''
+    });
+
+    const [viewResults, setViewResults] = useState([]);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [message, setMessage] = useState('');
+
+    const apiUrl = 'https://localhost:7270/api/Location/Location';
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleInsert = async () => {
+        try {
+            const response = await axios.post(apiUrl, {
+                flag: "INSERT",
+                locationId: null,
+                floor: form.floor,
+                section: form.section,
+                shelf: form.shelf,
+                locationName: null
+            });
+            setMessage(response.data.message || "Inserted.");
+        } catch (err) {
+            setMessage("Insert failed: " + err.message);
+        }
+    };
+
+    const handleUpdate = async () => {
+        if (!form.locationId) return setMessage("LocationID required for update.");
+        try {
+            const response = await axios.post(apiUrl, {
+                flag: "UPDATE",
+                locationId: form.locationId,
+                floor: form.floor,
+                section: form.section,
+                shelf: form.shelf,
+                locationName: null
+            });
+            setMessage(response.data.message || "Updated.");
+        } catch (err) {
+            setMessage("Update failed: " + err.message);
+        }
+    };
+
+    const handleView = async () => {
+        try {
+            const response = await axios.post(apiUrl, {
+                flag: "VIEW",
+                locationId: form.locationId ? parseInt(form.locationId) : null,
+                floor: null,
+                section: null,
+                shelf: null,
+                locationName: form.locationName || null
+            });
+            setViewResults(response.data.variables || []);
+            setMessage(response.data.message || "Fetched.");
+        } catch (err) {
+            setMessage("View failed: " + err.message);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!deleteTarget) return;
+        try {
+            const response = await axios.post(apiUrl, {
+                flag: "DELETE",
+                locationId: deleteTarget.locationId || null,
+                floor: null,
+                section: null,
+                shelf: null,
+                locationName: deleteTarget.locationName || null
+            });
+            setMessage(response.data.message || "Deleted.");
+            setDeleteTarget(null);
+            setShowDeleteConfirm(false);
+            handleView(); // Refresh after delete
+        } catch (err) {
+            setMessage("Delete failed: " + err.message);
+        }
+    };
+
+    const confirmDelete = (item) => {
+        setDeleteTarget(item);
+        setShowDeleteConfirm(true);
+    };
+
+    return (
+        <div style={{ display: 'flex', padding: '20px', fontFamily: 'sans-serif' }}>
+            {/* Left Pane - Form */}
+            <div style={{ flex: 1, marginRight: '20px' }}>
+                <h2>Location Management</h2>
+                <input type="text" name="locationId" placeholder="Location ID" value={form.locationId} onChange={handleChange} /><br />
+                <input type="text" name="floor" placeholder="Floor" value={form.floor} onChange={handleChange} /><br />
+                <input type="text" name="section" placeholder="Section" value={form.section} onChange={handleChange} /><br />
+                <input type="text" name="shelf" placeholder="Shelf" value={form.shelf} onChange={handleChange} /><br />
+                <input type="text" name="locationName" placeholder="Location Name" value={form.locationName} onChange={handleChange} /><br /><br />
+
+                <button onClick={handleInsert}>Insert</button>
+                <button onClick={handleUpdate}>Update</button>
+                <button onClick={handleView}>View</button>
+                <br /><br />
+                <div style={{ color: 'green' }}>{message}</div>
+            </div>
+
+            {/* Right Pane - Results */}
+            <div style={{ flex: 2 }}>
+                <h3>View Results</h3>
+                <table border="1" cellPadding="5">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Floor</th>
+                            <th>Section</th>
+                            <th>Shelf</th>
+                            <th>Location Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {viewResults.map(item => (
+                            <tr key={item.locationId}>
+                                <td>{item.locationId}</td>
+                                <td>{item.floor}</td>
+                                <td>{item.section}</td>
+                                <td>{item.shelf}</td>
+                                <td>{item.locationName}</td>
+                                <td>
+                                    <button style={{ color: 'red' }} onClick={() => confirmDelete(item)}>Delete</button>
+                                </td>
+                            </tr>
+                        ))}
+                        {viewResults.length === 0 && (
+                            <tr><td colSpan="6">No data found</td></tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && deleteTarget && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0, left: 0, width: '100%', height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center'
+                }}>
+                    <div style={{ background: '#fff', padding: 20, borderRadius: 10, width: 400 }}>
+                        <h3>Confirm Deletion</h3>
+                        <p><strong>LocationID:</strong> {deleteTarget.locationId}</p>
+                        <p><strong>LocationName:</strong> {deleteTarget.locationName}</p>
+                        <p><strong>Floor:</strong> {deleteTarget.floor}</p>
+                        <p><strong>Section:</strong> {deleteTarget.section}</p>
+                        <p><strong>Shelf:</strong> {deleteTarget.shelf}</p>
+                        <button onClick={handleDelete} style={{ color: 'white', background: 'red', marginRight: 10 }}>Confirm Delete</button>
+                        <button onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default Location;

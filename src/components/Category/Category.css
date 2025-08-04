@@ -1,0 +1,180 @@
+/* Main Container Split: Left Form / Right Results */
+.category-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem;
+  gap: 2rem;
+  font-family: "Segoe UI";
+  background: #f8f9fa;
+}
+
+/* Form Section */
+.category-form {
+  flex: 1;
+  padding: 2rem;
+  background: white;
+  border-radius: 1px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.category-form input,
+.category-form select {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  transition: border 0.2s ease-in-out;
+}
+
+.category-form input:focus,
+.category-form select:focus {
+  border-color: #5e3bee;
+  outline: none;
+}
+
+/* Action Buttons */
+.button-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.15s ease-in-out;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.btn.blue {
+  background-color: #007aff;
+  color: white;
+}
+
+.btn.green {
+  background-color: #34c759;
+  color: white;
+}
+
+.btn.purple {
+  background-color: #5856d6;
+  color: white;
+}
+
+.btn.red {
+  background-color: #ff3b30;
+  color: white;
+}
+
+.btn.grey {
+  background-color: #999;
+  color: white;
+}
+
+/* Results Table Section */
+.category-results {
+  flex: 2;
+  overflow-x: auto;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.category-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.category-table th,
+.category-table td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.category-table th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+.category-table td:last-child {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-box h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.modal-box p {
+  margin: 0.5rem 0;
+  color: #555;
+}
+
+/* Pagination Styles */
+.pagination {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.pagination button {
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: #e0e0e0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease-in-out;
+}
+
+.pagination button:hover {
+  background: #ccc;
+}
+
+.pagination button.active {
+  background: #5e3bee;
+  color: white;
+}
+
+/* Message */
+.status-message {
+  margin-top: 1rem;
+  color: #333;
+  font-weight: 500;
+}
