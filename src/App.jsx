@@ -12,7 +12,7 @@ const App = () => {
       <Location/>
       <Category/> 
       <AcquisitionType/>
-      {/* <Vendor/> */}
+      <Vendor/> 
     </div>
   )
 }

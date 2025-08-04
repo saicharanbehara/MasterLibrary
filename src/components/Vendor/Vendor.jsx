@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import axios from 'axios';
 import '../Vendor/Vendor.css';
 
@@ -217,6 +217,14 @@ const Vendor = () => {
         });
     };
 
+    const getCategoryNames = (ids) => {
+        return ids.map(id => categories.find(cat => cat.CategoryID === id)?.CategoryName).filter(Boolean).join(', ');
+    };
+
+    const getAcquisitionNames = (ids) => {
+        return ids.map(id => acquisitionTypes.find(acq => acq.AcquisitionTypeID === id)?.AcquisitionTypeName).filter(Boolean).join(', ');
+    };
+
     const indexOfLast = currentPage * resultsPerPage;
     const indexOfFirst = indexOfLast - resultsPerPage;
     const currentResults = viewResults.slice(indexOfFirst, indexOfLast);
@@ -224,7 +232,7 @@ const Vendor = () => {
 
     return (
         <div className="vendor-container">
-            <div className="vendor-form">
+                 <div className="vendor-form">
     <h2>Vendor Manager</h2>
 
     <input
@@ -327,7 +335,6 @@ const Vendor = () => {
     <p className="status-message">{message}</p>
 </div>
 
-
             <div className="vendor-results">
                 <h3>Vendor Records</h3>
                 <table className="vendor-table">
@@ -338,12 +345,14 @@ const Vendor = () => {
                             <th>Contact Person</th>
                             <th>Phone</th>
                             <th>Address</th>
+                            <th>Categories</th>
+                            <th>Acquisitions</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {currentResults.length === 0 ? (
-                            <tr><td colSpan="6">No data found</td></tr>
+                            <tr><td colSpan="8">No data found</td></tr>
                         ) : currentResults.map(item => (
                             <tr key={item.VendorID}>
                                 <td>{item.VendorID}</td>
@@ -351,6 +360,8 @@ const Vendor = () => {
                                 <td>{item.ContactPerson}</td>
                                 <td>{item.Phone}</td>
                                 <td>{item.Address}</td>
+                                <td>{getCategoryNames(item.vendorCategoryTypeResponseList?.map(c => c.CategoryID) || [])}</td>
+                                <td>{getAcquisitionNames(item.vendorAcquisitionTypeTypesResponseList?.map(a => a.AcquisitionTypeID) || [])}</td>
                                 <td>
                                     <button onClick={() => populateFormForUpdate(item)} className="btn grey">Update</button>
                                     <button onClick={() => confirmDelete(item)} className="btn red">Delete</button>
@@ -359,7 +370,6 @@ const Vendor = () => {
                         ))}
                     </tbody>
                 </table>
-
                 <div className="pagination">
                     <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>⬅ Prev</button>
                     <span>Page {currentPage} of {totalPages}</span>
@@ -374,6 +384,8 @@ const Vendor = () => {
                         {['VendorID', 'VendorName', 'ContactPerson', 'Phone', 'Address'].map((key, i) => (
                             <p key={i}><strong>{key}:</strong> {deleteTarget[key]}</p>
                         ))}
+                        <p><strong>Categories:</strong> {getCategoryNames(deleteTarget.vendorCategoryTypeResponseList?.map(c => c.CategoryID) || [])}</p>
+                        <p><strong>Acquisition Types:</strong> {getAcquisitionNames(deleteTarget.vendorAcquisitionTypeTypesResponseList?.map(a => a.AcquisitionTypeID) || [])}</p>
                         <div className="button-group">
                             <button onClick={handleDelete} className="btn red">Confirm Delete</button>
                             <button onClick={() => setShowDeleteConfirm(false)} className="btn grey">Cancel</button>
