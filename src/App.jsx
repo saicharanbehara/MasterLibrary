@@ -8,10 +8,10 @@ import Vendor from './components/Vendor/Vendor'
 const App = () => {
   return (
     <div>
-      {/* <Navbar/> */}
-      {/* <Location/>
+      <Navbar/>
+      <Location/>
       <Category/> 
-      <AcquisitionType/> */}
+      <AcquisitionType/>
       <Vendor/> 
     </div>
   )

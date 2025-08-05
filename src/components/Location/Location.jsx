@@ -20,7 +20,7 @@ const Location = () => {
     const [message, setMessage] = useState('');
     const [operation,setOperation] = useState('');
 
-    const apiUrl = 'https://localhost:7270/api/Location/Location';
+    const apiUrl = 'https://localhost:7270/api/Master/Location';
 
     const handleChange = (e) => {
         const { name, value } = e.target;
