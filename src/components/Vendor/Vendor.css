@@ -191,6 +191,12 @@
   gap: 1rem;
 }
 
+.checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .checkbox-label {
   display: flex;
   align-items: center;

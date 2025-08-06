@@ -1,409 +1,284 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState } from 'react';
 import axios from 'axios';
 import '../Vendor/Vendor.css';
+import CategoryCheckboxes from '../Category/CategoryCheckboxes';
+import AcquisitionTypeCheckboxes from '../AcquisitionType/AcquisitionTypeCheckboxes';
 
 const Vendor = () => {
-    const [form, setForm] = useState({
-        VendorID: '',
-        VendorName: '',
-        ContactPerson: '',
-        Phone: '',
-        Address: '',
-        categoryType: [],
-        acquisitionType: [],
+  const [form, setForm] = useState({
+    VendorID: '',
+    VendorName: '',
+    ContactPerson: '',
+    Phone: '',
+    Address: '',
+    categoryType: [],
+    acquisitionType: [],
+  });
+
+  const [viewResults, setViewResults] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [message, setMessage] = useState('');
+  const [editMode, setEditMode] = useState(false);
+
+  const resultsPerPage = 5;
+  const apiUrl = 'https://localhost:7270/api/Master/Vendor';
+
+  const handleCategoryChange = (categoryId) => {
+    setForm(prev => ({
+      ...prev,
+      categoryType: prev.categoryType.includes(categoryId)
+        ? prev.categoryType.filter(id => id !== categoryId)
+        : [...prev.categoryType, categoryId]
+    }));
+  };
+
+  const handleAcquisitionChange = (acquisitionId) => {
+    setForm(prev => ({
+      ...prev,
+      acquisitionType: prev.acquisitionType.includes(acquisitionId)
+        ? prev.acquisitionType.filter(id => id !== acquisitionId)
+        : [...prev.acquisitionType, acquisitionId]
+    }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const clearForm = () => {
+    setForm({
+      VendorID: '',
+      VendorName: '',
+      ContactPerson: '',
+      Phone: '',
+      Address: '',
+      categoryType: [],
+      acquisitionType: [],
     });
-
-    const [viewResults, setViewResults] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [deleteTarget, setDeleteTarget] = useState(null);
-    const [message, setMessage] = useState('');
-    const [operation, setOperation] = useState('');
-    const [categories, setCategories] = useState([]);
-    const [acquisitionTypes, setAcquisitionTypes] = useState([]);
-    const [editMode, setEditMode] = useState(false);
-
-
-    const resultsPerPage = 5;
-    const apiUrl = 'https://localhost:7270/api/Master/Vendor';
-
-    useEffect(() => {
-        fetchCategories();
-        fetchAcquisitionTypes();
-    }, []);
-
-    const fetchCategories = async () => {
-        try {
-            const response = await fetch('https://localhost:7270/api/Master/Category', {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ Flag: "VIEW" })
-            });
-            const data = await response.json();
-            setCategories(data.variables || []);
-        } catch (err) {
-            console.error('Error fetching categories:', err);
-            setMessage('Failed to load categories');
-        }
-    };
-
-    const fetchAcquisitionTypes = async () => {
-        try {
-            const response = await fetch('https://localhost:7270/api/Master/AquisitionType', {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ Flag: "VIEW" })
-            });
-            const data = await response.json();
-            setAcquisitionTypes(data.variables || []);
-        } catch (err) {
-            console.error('Error fetching acquisition types:', err);
-            setMessage('Failed to load acquisition types');
-        }
-    };
-
-    const handleCategoryChange = (categoryId) => {
-        setForm(prev => ({
-            ...prev,
-            categoryType: prev.categoryType.includes(categoryId)
-                ? prev.categoryType.filter(id => id !== categoryId)
-                : [...prev.categoryType, categoryId]
-        }));
-    };
-
-    const handleAcquisitionChange = (acquisitionId) => {
-        setForm(prev => ({
-            ...prev,
-            acquisitionType: prev.acquisitionType.includes(acquisitionId)
-                ? prev.acquisitionType.filter(id => id !== acquisitionId)
-                : [...prev.acquisitionType, acquisitionId]
-        }));
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
-    };
-
-    const clearForm = () => {
-        setForm({
-            VendorID: '',
-            VendorName: '',
-            ContactPerson: '',
-            Phone: '',
-            Address: '',
-            categoryType: [],
-            acquisitionType: [],
-        });
-        setOperation('');
-    };
-
-    const handleInsert = async () => {
-  const payload = {
-    vendor: {
-      VendorID: null,
-      VendorName: form.VendorName,
-      ContactPerson: form.ContactPerson,
-      Phone: form.Phone,
-      Address: form.Address,
-      Status: form.Status,
-      Flag: 'INSERT'
-    },
-    vendorCategoryTypeList: form.categoryType.map(categoryID => ({
-      VendorID: null, // Backend should assign this post-insert
-      CategoryID: categoryID
-    })),
-    vendorAcquisitionTypeList: form.acquisitionType.map(acquisitionTypeID => ({
-      VendorID: null, // Backend should assign this post-insert
-      AcquisitionTypeID: acquisitionTypeID
-    }))
-  };
-
-  try {
-    await axios.post('https://localhost:7270/api/Master/Vendor', payload);
-    setMessage('Vendor inserted successfully.');
-    handleView();
-  } catch (err) {
-    console.error(err);
-    setMessage('Insert failed.');
-  }
-};
-
-const handleUpdate = async () => {
-  const payload = {
-    vendor: {
-      VendorID: form.VendorID,
-      VendorName: form.VendorName,
-      ContactPerson: form.ContactPerson,
-      Phone: form.Phone,
-      Address: form.Address,
-      Status: form.Status,
-      Flag: 'UPDATE'
-    },
-    vendorCategoryTypeList: form.categoryType.map(categoryID => ({
-      VendorID: form.VendorID,
-      CategoryID: categoryID
-    })),
-    vendorAcquisitionTypeList: form.acquisitionType.map(acquisitionTypeID => ({
-      VendorID: form.VendorID,
-      AcquisitionTypeID: acquisitionTypeID
-    }))
-  };
-
-  try {
-    await axios.post('https://localhost:7270/api/Master/Vendor', payload);
-    setMessage('Vendor updated successfully.');
-    handleView();
     setEditMode(false);
-  } catch (err) {
-    console.error(err);
-    setMessage('Update failed.');
-  }
-};
+    setMessage('');
+  };
 
-
-    const handleView = async () => {
-        setOperation('VIEW');
-        try {
-            const response = await axios.post(apiUrl, {
-                Flag: "VIEW",
-                VendorID: form.VendorID ? parseInt(form.VendorID) : null,
-                VendorName: null,
-                ContactPerson: null,
-                Phone: null,
-                Address: null
-            });
-
-            const results = response.data.variables || [];
-
-            setViewResults(results);
-            setMessage(response.data.message || "Fetched.");
-            setCurrentPage(1);
-            clearForm();
-        } catch (err) {
-            setMessage("View failed: " + err.message);
-            clearForm();
-        }
+  const buildPayload = (flag) => {
+    const isInsert = flag === 'INSERT';
+    return {
+      flag,
+      vendorID: isInsert ? null : parseInt(form.VendorID) || null,
+      vendorName: form.VendorName || null,
+      contactPerson: form.ContactPerson || null,
+      phone: form.Phone || null,
+      address: form.Address || null,
+      vendorCategoryTypesVendor: form.categoryType.map(categoryID => ({
+        vendorID: isInsert ? null : parseInt(form.VendorID),
+        categoryID,
+        categoryName: null
+      })),
+      vendorAcquisitionTypeTypeVendor: form.acquisitionType.map(acquisitionTypeID => ({
+        vendorID: isInsert ? null : parseInt(form.VendorID),
+        acquisitionTypeID,
+        acquisitionTypeName: null
+      }))
     };
+  };
 
-    const handleDelete = async () => {
-        if (!deleteTarget) return;
-        setOperation('DELETE');
-        try {
-            const response = await axios.post(apiUrl, {
-                Flag: "DELETE",
-                VendorID: deleteTarget.VendorID
-            });
-            setMessage(response.data.message || "Deleted.");
-            setDeleteTarget(null);
-            setShowDeleteConfirm(false);
-            handleView();
-            clearForm();
-        } catch (err) {
-            setMessage("Delete failed: " + err.message);
-            clearForm();
-        }
+  const handleInsert = async () => {
+    const payload = buildPayload('INSERT');
+    try {
+      await axios.post(apiUrl, payload);
+      setMessage('Vendor inserted.');
+      handleView();
+      clearForm();
+    } catch (err) {
+      setMessage('Insert failed: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleUpdate = async () => {
+    const payload = buildPayload('UPDATE');
+    try {
+      await axios.post(apiUrl, payload);
+      setMessage('Vendor updated.');
+      handleView();
+      clearForm();
+    } catch (err) {
+      setMessage('Update failed: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleView = async () => {
+    const payload = {
+      flag: 'VIEW',
+      vendorID: null,
+      vendorName: null,
+      contactPerson: 'string',
+      phone: 'string',
+      address: 'string',
+      vendorCategoryTypesVendor: [{ vendorID: null, categoryID: 0, categoryName: 'string' }],
+      vendorAcquisitionTypeTypeVendor: [{ vendorID: null, acquisitionTypeID: 0, acquisitionTypeName: 'string' }]
     };
+    try {
+      const response = await axios.post(apiUrl, payload);
+      const vendors = response.data.vendorResponseList || [];
+      const categories = response.data.vendorCategoryTypeResponseList || [];
+      const acquisitions = response.data.vendorAcquisitionTypeTypesResponseList || [];
 
-    const confirmDelete = (item) => {
-        setDeleteTarget(item);
-        setShowDeleteConfirm(true);
+      const enriched = vendors.map(vendor => ({
+        ...vendor,
+        vendorCategoryTypeResponseList: categories.filter(c => c.vendorID === vendor.vendorID),
+        vendorAcquisitionTypeTypesResponseList: acquisitions.filter(a => a.vendorID === vendor.vendorID)
+      }));
+
+      setViewResults(enriched);
+      setMessage(response.data.message || 'Vendors fetched.');
+      setCurrentPage(1);
+      clearForm();
+    } catch (err) {
+      setMessage('View failed: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const payload = {
+      flag: 'DELETE',
+      vendorID: deleteTarget.vendorID,
+      vendorName: null,
+      contactPerson: null,
+      phone: null,
+      address: null,
+      vendorCategoryTypesVendor: [],
+      vendorAcquisitionTypeTypeVendor: []
     };
+    try {
+      await axios.post(apiUrl, payload);
+      setMessage('Vendor deleted.');
+      setShowDeleteConfirm(false);
+      handleView();
+    } catch (err) {
+      setMessage('Delete failed: ' + (err.response?.data?.message || err.message));
+    }
+  };
 
-    const populateFormForUpdate = (item) => {
-        setForm({
-            VendorID: item.VendorID,
-            VendorName: item.VendorName,
-            ContactPerson: item.ContactPerson,
-            Phone: item.Phone,
-            Address: item.Address,
-            categoryType: item.vendorCategoryTypeResponseList?.map(c => c.CategoryID) || [],
-            acquisitionType: item.vendorAcquisitionTypeTypesResponseList?.map(a => a.AcquisitionTypeID) || []
-        });
-    };
+  const confirmDelete = (item) => {
+    setDeleteTarget(item);
+    setShowDeleteConfirm(true);
+  };
 
-    const getCategoryNames = (ids) => {
-        return ids.map(id => categories.find(cat => cat.CategoryID === id)?.CategoryName).filter(Boolean).join(', ');
-    };
+  const populateFormForUpdate = (item) => {
+    setForm({
+      VendorID: item.vendorID,
+      VendorName: item.vendorName,
+      ContactPerson: item.contactPerson,
+      Phone: item.phone,
+      Address: item.address,
+      categoryType: item.vendorCategoryTypeResponseList?.map(c => c.categoryID) || [],
+      acquisitionType: item.vendorAcquisitionTypeTypesResponseList?.map(a => a.acquisitionTypeID) || []
+    });
+    setEditMode(true);
+  };
 
-    const getAcquisitionNames = (ids) => {
-        return ids.map(id => acquisitionTypes.find(acq => acq.AcquisitionTypeID === id)?.AcquisitionTypeName).filter(Boolean).join(', ');
-    };
+  const indexOfLast = currentPage * resultsPerPage;
+  const indexOfFirst = indexOfLast - resultsPerPage;
+  const currentResults = viewResults.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(viewResults.length / resultsPerPage);
 
-    const indexOfLast = currentPage * resultsPerPage;
-    const indexOfFirst = indexOfLast - resultsPerPage;
-    const currentResults = viewResults.slice(indexOfFirst, indexOfLast);
-    const totalPages = Math.ceil(viewResults.length / resultsPerPage);
+  return (
+    <div className="vendor-container">
+      <div className="vendor-form">
+        <h2>Vendor Manager</h2>
 
-    return (
-        <div className="vendor-container">
-                 <div className="vendor-form">
-    <h2>Vendor Manager</h2>
+        <input type="text" name="VendorID" placeholder="Vendor ID (auto)" value={form.VendorID} onChange={handleChange} disabled />
+        <input type="text" name="VendorName" placeholder="Vendor Name" value={form.VendorName} onChange={handleChange} />
+        <input type="text" name="ContactPerson" placeholder="Contact Person" value={form.ContactPerson} onChange={handleChange} />
+        <input type="text" name="Phone" placeholder="Phone" value={form.Phone} onChange={handleChange} />
+        <input type="text" name="Address" placeholder="Address" value={form.Address} onChange={handleChange} />
 
-    <input
-        type="text"
-        name="VendorID"
-        placeholder="Vendor ID (auto)"
-        value={form.VendorID}
-        onChange={handleChange}
-        className="Vendor-input"
-        disabled={operation === "INSERT"}
-    />
-
-    <input
-        type="text"
-        name="VendorName"
-        placeholder="Vendor Name"
-        value={form.VendorName}
-        onChange={handleChange}
-        className="Vendor-input"
-    />
-
-    <input
-        type="text"
-        name="ContactPerson"
-        placeholder="Contact Person"
-        value={form.ContactPerson}
-        onChange={handleChange}
-        className="Vendor-input"
-    />
-
-    <input
-        type="text"
-        name="Phone"
-        placeholder="Phone"
-        value={form.Phone}
-        onChange={handleChange}
-        className="Vendor-input"
-    />
-
-    <input
-        type="text"
-        name="Address"
-        placeholder="Address"
-        value={form.Address}
-        onChange={handleChange}
-        className="Vendor-input"
-    />
-
-    {/* Category Types Section */}
-    <div className="category-section">
-        <h3>Category Types</h3>
-        <div className="checkbox-grid">
-            {categories.length > 0 ? (
-                categories.map(category => (
-                    <label key={category.CategoryID} className="checkbox-item">
-                        <input
-                            type="checkbox"
-                            checked={form.categoryType.includes(category.CategoryID)}
-                            onChange={() => handleCategoryChange(category.CategoryID)}
-                        />
-                        <span>{category.CategoryName}</span>
-                    </label>
-                ))
-            ) : (
-                <p>No categories available</p>
-            )}
+        <div className="category-section">
+          <h3>Category Types</h3>
+          <div className="checkbox-grid">
+            <CategoryCheckboxes selected={form.categoryType} onToggle={handleCategoryChange} />
+          </div>
+          <p className="selection-count">Selected: {form.categoryType.length} categories</p>
         </div>
-        <p className="selection-count">Selected: {form.categoryType.length} categories</p>
-    </div>
 
-    {/* Acquisition Types Section */}
-    <div className="acquisition-section">
-        <h3>Acquisition Types</h3>
-        <div className="checkbox-grid">
-            {acquisitionTypes.length > 0 ? (
-                acquisitionTypes.map(acq => (
-                    <label key={acq.AcquisitionTypeID} className="checkbox-item">
-                        <input
-                            type="checkbox"
-                            checked={form.acquisitionType.includes(acq.AcquisitionTypeID)}
-                            onChange={() => handleAcquisitionChange(acq.AcquisitionTypeID)}
-                        />
-                        <span>{acq.AcquisitionTypeName}</span>
-                    </label>
-                ))
-            ) : (
-                <p>No acquisition types available</p>
-            )}
+        <div className="acquisition-section">
+          <h3>Acquisition Types</h3>
+          <div className="checkbox-grid">
+            <AcquisitionTypeCheckboxes selected={form.acquisitionType} onToggle={handleAcquisitionChange} />
+          </div>
+          <p className="selection-count">Selected: {form.acquisitionType.length} acquisition types</p>
         </div>
-        <p className="selection-count">Selected: {form.acquisitionType.length} acquisition types</p>
-    </div>
 
-    {/* Action Buttons */}
-    <div className="button-group">
-        <button onClick={handleInsert} className="btn blue">Insert</button>
-        <button onClick={handleUpdate} className="btn green">Update</button>
-        <button onClick={handleView} className="btn purple">View</button>
-    </div>
-
-    <p className="status-message">{message}</p>
-</div>
-
-            <div className="vendor-results">
-                <h3>Vendor Records</h3>
-                <table className="vendor-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Vendor</th>
-                            <th>Contact Person</th>
-                            <th>Phone</th>
-                            <th>Address</th>
-                            <th>Categories</th>
-                            <th>Acquisitions</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentResults.length === 0 ? (
-                            <tr><td colSpan="8">No data found</td></tr>
-                        ) : currentResults.map(item => (
-                            <tr key={item.VendorID}>
-                                <td>{item.VendorID}</td>
-                                <td>{item.VendorName}</td>
-                                <td>{item.ContactPerson}</td>
-                                <td>{item.Phone}</td>
-                                <td>{item.Address}</td>
-                                <td>{getCategoryNames(item.vendorCategoryTypeResponseList?.map(c => c.CategoryID) || [])}</td>
-                                <td>{getAcquisitionNames(item.vendorAcquisitionTypeTypesResponseList?.map(a => a.AcquisitionTypeID) || [])}</td>
-                                <td>
-                                    <button onClick={() => populateFormForUpdate(item)} className="btn grey">Update</button>
-                                    <button onClick={() => confirmDelete(item)} className="btn red">Delete</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className="pagination">
-                    <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>⬅ Prev</button>
-                    <span>Page {currentPage} of {totalPages}</span>
-                    <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>Next ➡</button>
-                </div>
-            </div>
-
-            {showDeleteConfirm && deleteTarget && (
-                <div className="modal-overlay">
-                    <div className="modal-box">
-                        <h3>🗑 Confirm Deletion</h3>
-                        {['VendorID', 'VendorName', 'ContactPerson', 'Phone', 'Address'].map((key, i) => (
-                            <p key={i}><strong>{key}:</strong> {deleteTarget[key]}</p>
-                        ))}
-                        <p><strong>Categories:</strong> {getCategoryNames(deleteTarget.vendorCategoryTypeResponseList?.map(c => c.CategoryID) || [])}</p>
-                        <p><strong>Acquisition Types:</strong> {getAcquisitionNames(deleteTarget.vendorAcquisitionTypeTypesResponseList?.map(a => a.AcquisitionTypeID) || [])}</p>
-                        <div className="button-group">
-                            <button onClick={handleDelete} className="btn red">Confirm Delete</button>
-                            <button onClick={() => setShowDeleteConfirm(false)} className="btn grey">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+        <div className="button-group">
+          <button onClick={handleInsert} className="btn blue" disabled={editMode}>Insert</button>
+          <button onClick={handleUpdate} className="btn green" disabled={!editMode}>Update</button>
+          <button onClick={handleView} className="btn purple">View</button>
+          <button onClick={clearForm} className="btn grey">Clear</button>
         </div>
-    );
+
+        <p className="status-message">{message}</p>
+      </div>
+
+      <div className="vendor-results">
+        <h3>Vendor Records</h3>
+        <table className="vendor-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Vendor</th>
+              <th>Contact Person</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Categories</th>
+              <th>Acquisitions</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentResults.length === 0 ? (
+              <tr><td colSpan="8">No data found</td></tr>
+            ) : currentResults.map(item => (
+              <tr key={item.vendorID}>
+                <td>{item.vendorID}</td>
+                <td>{item.vendorName}</td>
+                <td>{item.contactPerson}</td>
+                <td>{item.phone}</td>
+                <td>{item.address}</td>
+                <td>{item.vendorCategoryTypeResponseList?.map(c => c.categoryName).join(', ') || '—'}</td>
+                <td>{item.vendorAcquisitionTypeTypesResponseList?.map(a => a.acquisitionTypeName).join(', ') || '—'}</td>
+                <td>
+                  <button onClick={() => populateFormForUpdate(item)} className="btn yellow">Edit</button>
+                  <button onClick={() => confirmDelete(item)} className="btn red">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {viewResults.length > resultsPerPage && (
+          <div className="pagination">
+            <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Prev</button>
+            <span>Page {currentPage} of {totalPages}</span>
+            <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</button>
+          </div>
+        )}
+      </div>
+
+      {showDeleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Confirm Delete</h3>
+            <p>Delete Vendor ID {deleteTarget?.vendorID}?</p>
+            <button onClick={handleDelete} className="btn red">Yes, Delete</button>
+            <button onClick={() => setShowDeleteConfirm(false)} className="btn grey">Cancel</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Vendor;
