@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import "../Category/CategoryCheckboxes.css"; // You'll need to create this file
 
 const CategoryCheckboxes = ({ selected, onToggle }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -35,22 +38,54 @@ const CategoryCheckboxes = ({ selected, onToggle }) => {
     fetchCategories();
   }, []);
 
-  if (loading) return <p>Loading categories...</p>;
-  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
-  if (!categories.length) return <p>No categories available.</p>;
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleDropdown = () => setIsOpen((prev) => !prev);
+
+  const getSelectedNames = () => {
+    const names = categories
+      .filter((c) => selected.includes(c.categoryID))
+      .map((c) => c.categoryName);
+    return names.length > 0 ? names.join(", ") : "Select Categories";
+  };
 
   return (
-    <div>
-      {categories.map(({ categoryID, categoryName, status }) => (
-        <label key={categoryID} style={{ display: "block", marginBottom: 8 }}>
-          <input
-            type="checkbox"
-            checked={selected.includes(categoryID)}
-            onChange={() => onToggle(categoryID)}
-          />{" "}
-          {categoryName} ({status})
-        </label>
-      ))}
+    <div className="category-dropdown-container" ref={dropdownRef}>
+      <div className="category-dropdown-header" onClick={toggleDropdown}>
+        {getSelectedNames()}
+        <span className="category-dropdown-arrow">{isOpen ? "▲" : "▼"}</span>
+      </div>
+
+      {isOpen && (
+        <div className="category-dropdown-list">
+          {loading && <p className="category-loading">Loading...</p>}
+          {error && <p className="category-error">Error: {error}</p>}
+          {!loading && !error && categories.length === 0 && (
+            <p className="category-empty">No categories available.</p>
+          )}
+
+          {!loading &&
+            !error &&
+            categories.map(({ categoryID, categoryName, status }) => (
+              <label key={categoryID} className="category-checkbox-item">
+                <input
+                  type="checkbox"
+                  checked={selected.includes(categoryID)}
+                  onChange={() => onToggle(categoryID)}
+                />
+                {categoryName} ({status})
+              </label>
+            ))}
+        </div>
+      )}
     </div>
   );
 };

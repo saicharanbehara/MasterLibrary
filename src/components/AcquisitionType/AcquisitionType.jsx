@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../AcquisitionType/AcquisitionType.css';
 
-const Location = () => {
+const AcquisitionType = () => {
     const [form, setForm] = useState({
         acquisitionTypeID: '',
         acquisitionTypeName: '',
@@ -233,4 +233,4 @@ const Location = () => {
     );
 };
 
-export default Location;
+export default AcquisitionType;

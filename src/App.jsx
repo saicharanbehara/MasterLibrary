@@ -4,6 +4,7 @@ import Location from './components/Location/Location'
 import Category from './components/Category/Category'
 import AcquisitionType from './components/AcquisitionType/AcquisitionType'
 import Vendor from './components/Vendor/Vendor'
+import Publisher from './components/Publisher/Publisher'
 
 const App = () => {
   return (
@@ -12,7 +13,8 @@ const App = () => {
       <Location/>
       <Category/> 
       <AcquisitionType/>
-      <Vendor/> 
+      <Vendor/>
+      <Publisher/> 
     </div>
   )
 }

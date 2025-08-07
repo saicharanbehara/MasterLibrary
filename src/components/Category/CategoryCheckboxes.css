@@ -1,0 +1,74 @@
+.category-dropdown-container {
+  position: relative;
+  width: 300px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+}
+
+.category-dropdown-header {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border 0.3s;
+}
+
+.category-dropdown-header:hover {
+  border-color: #888;
+}
+
+.category-dropdown-arrow {
+  font-size: 12px;
+  margin-left: 10px;
+  color: #333;
+}
+
+.category-dropdown-list {
+  position: absolute;
+  top: 105%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.category-checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  margin-bottom: 6px;
+  cursor: pointer;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.category-checkbox-item:hover {
+  background-color: #f0f0f0;
+}
+
+.category-checkbox-item input[type="checkbox"] {
+  margin: 0;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.category-loading,
+.category-error,
+.category-empty {
+  font-style: italic;
+  color: #555;
+  padding: 5px 0;
+}
