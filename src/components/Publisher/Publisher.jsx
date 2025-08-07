@@ -46,7 +46,7 @@ const Publisher = () => {
         publisherCode: form.publisherCode,
         isAvailable: form.isAvailable === 'True',
       });
-      setMessage(response.data.MESSAGE || 'Inserted.');
+      setMessage(response.data.message || 'Inserted.');
       clearForm();
       handleView();
     } catch (err) {
@@ -68,7 +68,7 @@ const Publisher = () => {
         publisherCode: form.publisherCode,
         isAvailable: form.isAvailable === 'True',
       });
-      setMessage(response.data.MESSAGE || 'Updated.');
+      setMessage(response.data.message || 'Updated.');
       clearForm();
       handleView();
     } catch (err) {
@@ -89,8 +89,8 @@ const Publisher = () => {
         isAvailable: form.isAvailable === 'True',
       });
       console.log('API response:', response.data);
-      setViewResults(response.data.Variables || []);
-      setMessage(response.data.MESSAGE?.trim() || 'Fetched.');
+      setViewResults(response.data.variables || []);
+      setMessage(response.data.message?.trim() || 'Fetched.');
       setCurrentPage(1);
       clearForm();
     } catch (err) {
@@ -110,7 +110,7 @@ const Publisher = () => {
         publisherCode: null,
         isAvailable: null,
       });
-      setMessage(response.data.MESSAGE || 'Deleted.');
+      setMessage(response.data.message || 'Deleted.');
       setDeleteTarget(null);
       setShowDeleteConfirm(false);
       clearForm();

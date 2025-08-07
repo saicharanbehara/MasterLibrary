@@ -5,6 +5,7 @@ import Category from './components/Category/Category'
 import AcquisitionType from './components/AcquisitionType/AcquisitionType'
 import Vendor from './components/Vendor/Vendor'
 import Publisher from './components/Publisher/Publisher'
+import Author from './components/Author/Author'
 
 const App = () => {
   return (
@@ -13,8 +14,9 @@ const App = () => {
       <Location/>
       <Category/> 
       <AcquisitionType/>
-      <Vendor/>
-      <Publisher/> 
+      <Vendor/> 
+      <Publisher/>
+      <Author/>
     </div>
   )
 }
